@@ -43,7 +43,8 @@ editmenu.add_command(label="Paste               ", command=hello)
 menubar.add_cascade(label="Edit", menu=editmenu)
 
 helpmenu = Menu(menubar, tearoff=0)
-helpmenu.add_command(label="About               ", command=hello)
+helpmenu.add_command(label="About EasyPhotoEditor       ", command=hello)
+helpmenu.add_command(label="Check for updates           ", command=hello)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
