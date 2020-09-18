@@ -3,26 +3,105 @@
 # www.github.com/SabirKhanAkash
 
 from tkinter import *
-from PIL import ImageTk,Image
+from PIL import ImageTk, Image, ImageDraw
+from PIL import Image
 from tkinter import font, colorchooser, filedialog, messagebox
 from tkinter import ttk
 import tkinter as tk
+import os,sys
+import tkinter.messagebox
+
 
 root = Tk()
 root.title("Easy Photo Editor")
 root.iconbitmap("icons/EasyPhotoEditor.ico")
 root.state("zoomed")
-# root.minsize(1366, 768)
+
+global op
+# global my_ImageOpen
+# global edge 
+# global my_label2 
+op = 0
 
 def hello():
     print("hello!")
 
-def file_open():
+def file_open(event=None):
 	global my_ImageOpen
-	frame.filename = filedialog.askopenfilename(initialdir="D:/Study Materials/Study/My Python Workspace/3-2 Project/EasyPhotoEditor/Images", title= " Select a file", filetypes= (("png","*.png"),("jpg", " *.jpg"),("All files","*.*")))
-	my_ImageOpen = ImageTk.PhotoImage(Image.open(frame.filename))
+	global my_label2 
+	global edge 
+	global op
+	op = 1
+	frame.filename = filedialog.askopenfilename(initialdir=os.getcwd(), title= " Select a file", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
+	edge = Image.open(frame.filename)
+	my_ImageOpen = ImageTk.PhotoImage(edge)
 	my_label2 = ttk.Label(frame,image=my_ImageOpen)
 	my_label2.pack(side=LEFT,fill=X)
+	width, height = edge.size
+	print(width, height)
+
+
+def save(event=None):
+	if op == 0:
+		tkinter.messagebox.showerror("Error","Open an image first !") 
+	else:
+		Image.open(frame.filename).save(frame.filename)
+		print(op)
+
+
+def save_as(event=None):
+	if op == 1:
+		filename = filedialog.asksaveasfile(mode='w', defaultextension='.jpg', title= " Save file as", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
+		edge.save(filename)
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+		
+def rename(event=None):
+	if op == 1:
+		global e,f,renameWindow
+		renameWindow = Tk()
+		renameWindow.title("Rename this image")
+		renameWindow.iconbitmap("icons/rename.ico")
+		renameWindow.geometry("+400+250")
+		renameWindow.minsize(300, 180)
+		e = Entry(renameWindow, width=25,borderwidth=2)
+		e.pack(side=LEFT,padx=15)
+		e.insert(0, "Enter current name here")
+		e.configure(state=DISABLED)
+
+		def on_click(event):
+		    e.configure(state=NORMAL)
+		    e.delete(0, END)
+		    e.unbind('<Button-1>', on_click_id_e)
+
+		on_click_id_e = e.bind('<Button-1>', on_click)
+
+		f = Entry(renameWindow, width=25,borderwidth=2)
+		f.pack(side=LEFT,padx=15)
+		f.insert(0, "Enter new name here")
+		f.configure(state=DISABLED)
+
+		def on_click(event):
+		    f.configure(state=NORMAL)
+		    f.delete(0, END)
+		    f.unbind('<Button-1>', on_click_id_f)
+
+		on_click_id_f = f.bind('<Button-1>', on_click)
+
+		renameButton = ttk.Button(renameWindow, text="Rename", command=ren)
+		renameButton.pack(side=LEFT,padx=10)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def ren():
+	global NewName,oldName 
+	oldName = e.get()
+	newName = f.get()
+	os.chdir('D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images')
+	os.rename(oldName+".jpg",newName+".jpg")
+	tkinter.messagebox.showinfo("Rename","Renamed successfully !")
+
 
 # create pulldown menus
 menubar = Menu(root)
@@ -76,9 +155,9 @@ thememenu = tk.Menu(menubar, tearoff=0)
 
 #adding commands
 filemenu.add_command(label="Open File  				    ", command=file_open, image=openf_icon, compound=tk.LEFT, accelerator='ctrl+O')
-filemenu.add_command(label="Save				        ", command=hello, image=save_icon, compound=tk.LEFT, accelerator='ctrl+S')
-filemenu.add_command(label="Save As    		            ", command=hello, image=saveas_icon, compound=tk.LEFT, accelerator='ctrl+alt+S')
-filemenu.add_command(label="Rename    		            ", command=hello, image=rename_icon, compound=tk.LEFT, accelerator='ctrl+R')
+filemenu.add_command(label="Save				        ", command=save, image=save_icon, compound=tk.LEFT, accelerator='ctrl+S')
+filemenu.add_command(label="Save As    		            ", command=save_as, image=saveas_icon, compound=tk.LEFT, accelerator='ctrl+alt+S')
+filemenu.add_command(label="Rename    		            ", command=rename, image=rename_icon, compound=tk.LEFT, accelerator='ctrl+R')
 filemenu.add_separator()
 filemenu.add_command(label="Exit				        ", command=root.quit, image=exit_icon, compound=tk.LEFT, accelerator='ctrl+Q')
 
@@ -125,7 +204,7 @@ frame.pack(side=LEFT)
 frameOpenFile = LabelFrame(root, padx=115, pady=5)
 frameOpenFile.pack(side=TOP)
 
-frameTools = LabelFrame(root, padx=10, pady=10)
+frameTools = LabelFrame(root, padx=10, pady=0)
 frameTools.pack(side=TOP)
 
 frameShare = LabelFrame(root)
@@ -134,33 +213,9 @@ frameShare.pack(side=TOP)
 framesiteShare = LabelFrame(root)
 framesiteShare.pack(side=TOP)
 
-
-def open():
-	global my_ImageOpen
-	frame.filename = filedialog.askopenfilename(initialdir="D:/Study Materials/Study/My Python Workspace/3-2 Project/EasyPhotoEditor/Images", title= " Select a file", filetypes= (("png","*.png"),("jpg", " *.jpg"),("All files","*.*")))
-	my_ImageOpen = ImageTk.PhotoImage(Image.open(frame.filename))
-	my_label2 = ttk.Label(frame,image=my_ImageOpen)
-	my_label2.pack()
-
-OpenImageButton = ttk.Button(frameOpenFile, text="Click here to open an image ",image=open_icon, compound=tk.TOP, command= open)
+OpenImageButton = ttk.Button(frameOpenFile, text="Click here to open an image ",image=open_icon, compound=tk.TOP, command= file_open)
 OpenImageButton.pack(ipadx=5,ipady=10, padx=5, pady=15)
 
-# my_img = ImageTk.PhotoImage(Image.open("Images/Sample 3.png"))
-# my_label = Label(frame,text="currently no photo is selected !!!")
-# my_label.pack()
-
-
-# def myClick1():
-# 	myLabel1 = Label(root, text="Thanks for your rating !")
-# 	myLabel1.grid()
-
-# def myClick2():
-# 	myLabel2 = Label(root, text="don't forget to rate us.")
-# 	myLabel2.grid()
-
-# def myClick3():
-# 	myLabel3 = Label(root, text="OK We'll ask you later.")
-# 	myLabel3.grid()
 
 myButton1 = ttk.Button(frameTools, text="Crop")
 myButton2 = ttk.Button(frameTools, text="Rotate")
@@ -174,7 +229,7 @@ tabControl = ttk.Notebook(frameTools)
 
 crop = ttk.Frame(tabControl)
 tabControl.add(crop, text="    Crop    ", image=crop_icon, compound=tk.TOP)
-tabControl.grid(row=0,column=0,ipady=160, pady=5)
+tabControl.grid(row=0,column=0)
 
 rotate = ttk.Frame(tabControl)
 tabControl.add(rotate, text="    Rotate    ", image=rotate_icon, compound=tk.TOP)
@@ -196,17 +251,10 @@ adjust = ttk.Frame(tabControl)
 tabControl.add(adjust, text="    Adjust    ", image=adjust_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=4)
 
-# myButton1.grid(row=0, column=0, ipadx=1, ipady=8, )
-# myButton2.grid(row=0, column=1, padx=15, ipadx=1, ipady=8)
-# myButton3.grid(row=2, column=2, padx=30)
-# myButton4.grid(row=3, column=2, padx=30)
-# myButton5.grid(row=5, column=2, padx=30)
-# myButton6.grid(row=6, column=2, padx=30)
-# myButton2.pack(ipadx=20,ipady=10, padx=10, pady=10)
-# myButton3.pack(ipadx=20,ipady=10, padx=10, pady=10)
-# myButton4.pack(ipadx=20,ipady=10, padx=10, pady=10)
-# myButton5.pack(ipadx=20,ipady=10, padx=10, pady=10)
-# myButton6.pack(ipadx=20,ipady=10, padx=10, pady=10)
+imgsizeLabel = tk.Entry(crop)
+imgsizeLabel.pack()
+
+
 
 shareLabel = Label(frameShare, text="Share this image by uploading to following social networking sites !", image=share_icon, compound=tk.LEFT)
 shareLabel.pack(side=TOP)
