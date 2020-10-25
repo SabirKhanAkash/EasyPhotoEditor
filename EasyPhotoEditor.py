@@ -18,27 +18,38 @@ root.iconbitmap("icons/EasyPhotoEditor.ico")
 root.state("zoomed")
 
 global op
-# global my_ImageOpen
-# global edge 
-# global my_label2 
 op = 0
+
+#All Functions
 
 def hello():
     print("hello!")
 
 def file_open(event=None):
+
 	global my_ImageOpen
 	global my_label2 
 	global edge 
 	global op
+	global count
+	global ImgDetails
+
 	op = 1
+	if count == 0:
+		ImgDetails.destroy()
+
+	count = 1;
 	frame.filename = filedialog.askopenfilename(initialdir=os.getcwd(), title= " Select a file", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
 	edge = Image.open(frame.filename)
 	my_ImageOpen = ImageTk.PhotoImage(edge)
 	my_label2 = ttk.Label(frame,image=my_ImageOpen)
 	my_label2.pack(side=LEFT,fill=X)
 	width, height = edge.size
-	print(width, height)
+
+	if count == 1:
+		ImgDetails = Label(frameOpenFile, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack()
+		count = 0
 
 
 def save(event=None):
@@ -102,6 +113,21 @@ def ren():
 	os.rename(oldName+".jpg",newName+".jpg")
 	tkinter.messagebox.showinfo("Rename","Renamed successfully !")
 
+def crop_now():
+	if op == 1:
+		global x1,x2,y1,y2 
+		x1 = imgX1Label.get()
+		y1 = imgY1Label.get()
+		x2 = imgX2Label.get()
+		y2 = imgY2Label.get()
+		CroppedImage = edge.crop((x1,y1,x2,y2))
+		my_ImageOpen1 = ImageTk.PhotoImage(CroppedImage)
+		my_label2s = ttk.Label(frame,image=my_ImageOpen1)
+		my_label2s.pack(side=LEFT,fill=X)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
 
 # create pulldown menus
 menubar = Menu(root)
@@ -134,6 +160,9 @@ night_blue_icon = tk.PhotoImage(file='icons/night_blue.png')
 
 crop_icon = tk.PhotoImage(file='icons/crop.png')
 rotate_icon = tk.PhotoImage(file='icons/rotate.png')
+rotateR_icon = tk.PhotoImage(file='icons/rotateR.png')
+hflip_icon = tk.PhotoImage(file='icons/hflip.png')
+vflip_icon = tk.PhotoImage(file='icons/vflip.png')
 effects_icon = tk.PhotoImage(file='icons/effects.png')
 text_icon = tk.PhotoImage(file='icons/text.png')
 draw_icon = tk.PhotoImage(file='icons/draw.png')
@@ -201,7 +230,7 @@ root.config(menu=menubar)
 frame = LabelFrame(root,padx=20, pady=20, height=700, width= 950)
 frame.pack(side=LEFT)
 
-frameOpenFile = LabelFrame(root, padx=115, pady=5)
+frameOpenFile = LabelFrame(root, padx=115, pady=1)
 frameOpenFile.pack(side=TOP)
 
 frameTools = LabelFrame(root, padx=10, pady=0)
@@ -214,7 +243,7 @@ framesiteShare = LabelFrame(root)
 framesiteShare.pack(side=TOP)
 
 OpenImageButton = ttk.Button(frameOpenFile, text="Click here to open an image ",image=open_icon, compound=tk.TOP, command= file_open)
-OpenImageButton.pack(ipadx=5,ipady=10, padx=5, pady=15)
+OpenImageButton.pack(ipadx=5,ipady=8, padx=5, pady=4)
 
 
 myButton1 = ttk.Button(frameTools, text="Crop")
@@ -251,10 +280,79 @@ adjust = ttk.Frame(tabControl)
 tabControl.add(adjust, text="    Adjust    ", image=adjust_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=4)
 
-imgsizeLabel = tk.Entry(crop)
-imgsizeLabel.pack()
+
+#CROP SEGMENT
+
+ep = Image.open("Images/Test.jpg")
+HelpImage = ImageTk.PhotoImage(ep)
+HelpImageLabel = ttk.Label(crop,image=HelpImage)
+HelpImageLabel.pack()
+
+imgX1Label = tk.Entry(crop, width=45,borderwidth=4)
+imgX1Label.pack(ipadx=0,ipady=1,padx=2, pady=5)
+imgX1Label.insert(0, "Enter X1 value here")
+imgX1Label.configure(state=DISABLED)
+
+def on_click(event):
+		    imgX1Label.configure(state=NORMAL)
+		    imgX1Label.delete(0, END)
+		    imgX1Label.unbind('<Button-1>', on_click_id_X1)
+
+on_click_id_X1 = imgX1Label.bind('<Button-1>', on_click)
+
+imgY1Label = tk.Entry(crop, width=45,borderwidth=4)
+imgY1Label.pack(ipadx=0,ipady=1,padx=1, pady=5)
+imgY1Label.insert(0, "Enter Y1 value here")
+imgY1Label.configure(state=DISABLED)
+
+def on_click(event):
+		    imgY1Label.configure(state=NORMAL)
+		    imgY1Label.delete(0, END)
+		    imgY1Label.unbind('<Button-1>', on_click_id_Y1)
+
+on_click_id_Y1 = imgY1Label.bind('<Button-1>', on_click)
+
+imgX2Label = tk.Entry(crop, width=45,borderwidth=4)
+imgX2Label.pack(ipadx=0,ipady=1,padx=1, pady=5)
+imgX2Label.insert(0, "Enter X2 value here")
+imgX2Label.configure(state=DISABLED)
+
+def on_click(event):
+		    imgX2Label.configure(state=NORMAL)
+		    imgX2Label.delete(0, END)
+		    imgX2Label.unbind('<Button-1>', on_click_id_X2)
+
+on_click_id_X2 = imgX2Label.bind('<Button-1>', on_click)
+
+imgY2Label = tk.Entry(crop, width=45,borderwidth=4)
+imgY2Label.pack(ipadx=0,ipady=1,padx=1, pady=5)
+imgY2Label.insert(0, "Enter Y2 value here")
+imgY2Label.configure(state=DISABLED)
+
+def on_click(event):
+		    imgY2Label.configure(state=NORMAL)
+		    imgY2Label.delete(0, END)
+		    imgY2Label.unbind('<Button-1>', on_click_id_Y2)
+
+on_click_id_Y2 = imgY2Label.bind('<Button-1>', on_click)
+
+CropButton = ttk.Button(crop, text="Crop", compound=tk.TOP,command=crop_now)
+CropButton.pack(ipadx=2,ipady=3, padx=5, pady=5)
 
 
+#Rotate Segment
+
+LeftRotate = ttk.Button(rotate, text="Left Rotation", compound=tk.TOP, image=rotate_icon)
+LeftRotate.pack(side=LEFT,ipadx=8,ipady=6, padx=15, pady=6)
+RightRotate = ttk.Button(rotate, text="Right Rotation", compound=tk.TOP, image=rotateR_icon)
+RightRotate.pack(side=RIGHT,ipadx=5,ipady=6, padx=15, pady=6)
+HorizontalRotate = ttk.Button(rotate, text="Horizontal Flip", compound=tk.TOP, image=hflip_icon)
+HorizontalRotate.pack(side=TOP,ipadx=3,ipady=6, padx=15, pady=37)
+VerticalRotate = ttk.Button(rotate, text="Vertical Flip", compound=tk.TOP, image=vflip_icon)
+VerticalRotate.pack(side=BOTTOM,ipadx=9,ipady=6, padx=15, pady=39)
+
+
+#Share Buttons Segment
 
 shareLabel = Label(frameShare, text="Share this image by uploading to following social networking sites !", image=share_icon, compound=tk.LEFT)
 shareLabel.pack(side=TOP)
@@ -268,7 +366,5 @@ fbButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, compound
 fbButton.pack(side=LEFT,padx=3)
 fbButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP)
 fbButton.pack(side=LEFT,padx=3)
-
-
 
 root.mainloop()
