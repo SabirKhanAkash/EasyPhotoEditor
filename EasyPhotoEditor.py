@@ -4,6 +4,7 @@
 
 from tkinter import *
 from PIL import ImageTk, Image, ImageDraw
+from PIL import ImageFilter
 from PIL import Image
 from tkinter import font, colorchooser, filedialog, messagebox
 from tkinter import ttk
@@ -18,6 +19,7 @@ root.iconbitmap("icons/EasyPhotoEditor.ico")
 root.state("zoomed")
 
 global op
+global my_label2
 op = 0
 
 #All Functions
@@ -39,8 +41,9 @@ def file_open(event=None):
 		ImgDetails.destroy()
 
 	count = 1;
-	frame.filename = filedialog.askopenfilename(initialdir=os.getcwd(), title= " Select a file", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
+	frame.filename = filedialog.askopenfilename(initialdir="D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images\\", title= " Select a file", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
 	edge = Image.open(frame.filename)
+
 	my_ImageOpen = ImageTk.PhotoImage(edge)
 	my_label2 = ttk.Label(frame,image=my_ImageOpen)
 	my_label2.pack(side=LEFT,fill=X)
@@ -109,21 +112,27 @@ def ren():
 	global NewName,oldName 
 	oldName = e.get()
 	newName = f.get()
-	os.chdir('D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images')
+	os.chdir('D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images\\')
 	os.rename(oldName+".jpg",newName+".jpg")
 	tkinter.messagebox.showinfo("Rename","Renamed successfully !")
 
 def crop_now():
+	global my_label2,my_ImageOpen,edge
 	if op == 1:
+		
 		global x1,x2,y1,y2 
-		x1 = imgX1Label.get()
-		y1 = imgY1Label.get()
-		x2 = imgX2Label.get()
-		y2 = imgY2Label.get()
-		CroppedImage = edge.crop((x1,y1,x2,y2))
-		my_ImageOpen1 = ImageTk.PhotoImage(CroppedImage)
-		my_label2s = ttk.Label(frame,image=my_ImageOpen1)
-		my_label2s.pack(side=LEFT,fill=X)
+		x1 = float(imgX1Label.get())
+		y1 = float(imgY1Label.get())
+		x2 = float(imgX2Label.get())
+		y2 = float(imgY2Label.get())
+		print(x1,y1,x2,y2)
+		edge = edge.crop((x1,y1,x2,y2))
+		
+		my_label2.destroy()
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=LEFT,fill=X)
 
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")
@@ -248,7 +257,7 @@ OpenImageButton.pack(ipadx=5,ipady=8, padx=5, pady=4)
 
 myButton1 = ttk.Button(frameTools, text="Crop")
 myButton2 = ttk.Button(frameTools, text="Rotate")
-myButton3 = ttk.Button(frameTools, text="Effects")
+myButton3 = ttk.Button(frameTools, text="Filters")
 myButton4 = ttk.Button(frameTools, text="Add Text")
 myButton5 = ttk.Button(frameTools, text="Draw")
 myButton6 = ttk.Button(frameTools, text="Adjust")
@@ -264,8 +273,8 @@ rotate = ttk.Frame(tabControl)
 tabControl.add(rotate, text="    Rotate    ", image=rotate_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=1)
 
-effects = ttk.Frame(tabControl)
-tabControl.add(effects, text="    Effects    ", image=effects_icon, compound=tk.TOP)
+filters = ttk.Frame(tabControl)
+tabControl.add(filters, text="    Filters    ", image=effects_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=2)
 
 addtext = ttk.Frame(tabControl)
@@ -351,6 +360,15 @@ HorizontalRotate.pack(side=TOP,ipadx=3,ipady=6, padx=15, pady=37)
 VerticalRotate = ttk.Button(rotate, text="Vertical Flip", compound=tk.TOP, image=vflip_icon)
 VerticalRotate.pack(side=BOTTOM,ipadx=9,ipady=6, padx=15, pady=39)
 
+
+#Filters Segment
+
+Filter1 = ttk.Button(filters, text="Filter 1", compound=tk.TOP)
+Filter1.place(x=35,y=18)
+Filter2 = ttk.Button(filters, text="Filter 2", compound=tk.TOP)
+Filter2.place(x=155,y=18)
+Filter3 = ttk.Button(filters, text="Filter 3", compound=tk.TOP)
+Filter3.place(x=270,y=18)
 
 #Share Buttons Segment
 
