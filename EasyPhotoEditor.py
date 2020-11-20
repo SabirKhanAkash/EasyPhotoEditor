@@ -16,6 +16,7 @@ import tkinter as tk
 import os,sys
 import tkinter.messagebox
 from tkinter.ttk import Combobox
+from PIL import ImageEnhance
 
 
 root = Tk()
@@ -27,6 +28,7 @@ global op
 global my_label2
 global width, height
 global reset_image
+global brmeter
 op = 0
 
 #All Functions
@@ -205,16 +207,23 @@ def crop_now():
 
 
 def reset_now():
-	global imgX1Label,imgY1Label,imgX2Label,imgY2Label,txtY1Label,txtX1Label
+	global imgX1Label,imgY1Label,imgX2Label,imgY2Label,txtY1Label,txtX1Label,txtLabel
 	global my_label2,my_ImageOpen,edge,width,height
 	global reset_image
+	brightness.set(5)
+	contrast.set(5)
+	shadow.set(5)
+	saturation.set(5)
+	sharpness.set(5)
+	
 
-	edge = reset_image
 	if op == 1:
 		my_label2.destroy()
 		my_ImageOpen = ImageTk.PhotoImage(reset_image)
 		my_label2 = ttk.Label(frame,image=my_ImageOpen)
 		my_label2.pack(side=LEFT,fill=X)
+		
+		edge = reset_image
 
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")
@@ -263,6 +272,7 @@ def reset_now():
 
 	on_click_id_Y2 = imgY2Label.bind('<Button-1>', on_click)
 
+	txtX1Label.delete(0, END)
 	txtX1Label.insert(0, "Enter X1 value here")
 	txtX1Label.configure(state=DISABLED)
 
@@ -273,8 +283,7 @@ def reset_now():
 
 	on_click_id_tX1 = txtX1Label.bind('<Button-1>', on_click)
 
-	txtY1Label = tk.Entry(addtext, width=30,borderwidth=3)
-	txtY1Label.place(x=95,y=220,height=28,width=187)
+	txtY1Label.delete(0, END)
 	txtY1Label.insert(0, "Enter Y1 value here")
 	txtY1Label.configure(state=DISABLED)
 
@@ -284,6 +293,17 @@ def reset_now():
 			    txtY1Label.unbind('<Button-1>', on_click_id_tY1)
 
 	on_click_id_tY1 = txtY1Label.bind('<Button-1>', on_click)
+
+	txtLabel.delete(0, END)
+	txtLabel.insert(0, "Enter your Text here")
+	txtLabel.configure(state=DISABLED)
+
+	def on_click(event):
+			    txtLabel.configure(state=NORMAL)
+			    txtLabel.delete(0, END)
+			    txtLabel.unbind('<Button-1>', on_click_id_tX)
+
+	on_click_id_tX = txtLabel.bind('<Button-1>', on_click)
 
 
 def left_rotate():
@@ -500,7 +520,9 @@ def smooth_more():
 
 def greyscale():
 	global my_label2,my_ImageOpen,edge,a, ImgDetails
-	
+	global newr,newg,newb,r,g,b,px,py,pixels
+	global reset_image2
+	reset_image2 = edge
 
 	if op == 1:
 		ImgDetails.destroy()
@@ -529,13 +551,14 @@ def greyscale():
 
 def sepia():
 	global my_label2,my_ImageOpen,edge,a, ImgDetails
-	
+	global newr,newg,newb,r,g,b,px,py,pixels,reset_image
+	reset_image = edge
 
 	if op == 1:
 		ImgDetails.destroy()
 		my_label2.destroy()
 		width, height = edge.size
-		edge.convert("RGB")
+		# edge.convert("RGB")
 		pixels = edge.load()
 		
 
@@ -644,73 +667,74 @@ def fontSizeClicked(event):
 	print(Fontsize)	
 
 def addtextnow():
-	global my_label2,my_ImageOpen,edge,a, ImgDetails, Fontfamily,Fontcolor, Fontsize, txtX1Label, txtY1Label
+	global reset_image,draw,my_label2,my_ImageOpen,edge,a, ImgDetails, Fontfamily,Fontcolor, Fontsize, txtX1Label, txtY1Label,txtLabel
 	
-
 	if op == 1:
 		ImgDetails.destroy()
 		my_label2.destroy()
 		a = float(txtX1Label.get())
 		b = float(txtY1Label.get())
+		maintext = txtLabel.get()
 		
 		width, height = edge.size
 		font_type = ImageFont.truetype(Fontfamily,Fontsize)
+		reset_image = edge
 		draw = ImageDraw.Draw(edge)
 		if Fontcolor == "Violet":
 			vr = int(102)
 			vg = int(0) 
 			vb = int(102)
-			draw.text(xy=(a,b),text="Hello World",fill=(vr,vg,vb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(vr,vg,vb),font=font_type)
 		elif Fontcolor == "Yellow":
 			yr = int(255)
 			yg = int(255)
 			yb = int(0)
-			draw.text(xy=(a,b),text="Hello World",fill=(yr,yg,yb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(yr,yg,yb),font=font_type)
 		elif Fontcolor == "Blue":
 			br = int(0)
 			bg = int(0)
 			bb = int(255)
-			draw.text(xy=(a,b),text="Hello World",fill=(br,bg,bb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(br,bg,bb),font=font_type)
 		elif Fontcolor == "Green":
 			gr = int(0)
 			gg = int(102)
 			gb = int(0)
-			draw.text(xy=(a,b),text="Hello World",fill=(gr,gg,gb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(gr,gg,gb),font=font_type)
 		elif Fontcolor == "Orange":
 			orr = int(255)
 			org = int(128)
 			orb = int(0)
-			draw.text(xy=(a,b),text="Hello World",fill=(orr,org,orb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(orr,org,orb),font=font_type)
 		elif Fontcolor == "Black":
 			br = int(0)
 			bg = int(0)
 			bb = int(0)
-			draw.text(xy=(a,b),text="Hello World",fill=(br,bg,bb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(br,bg,bb),font=font_type)
 		elif Fontcolor == "Brown":
 			brr = int(102)
 			brg = int(51)
 			brb = int(0)
-			draw.text(xy=(a,b),text="Hello World",fill=(brr,brg,brb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(brr,brg,brb),font=font_type)
 		elif Fontcolor == "White":
 			wr = int(255)
 			wg = int(255)
 			wb = int(255)
-			draw.text(xy=(a,b),text="Hello World",fill=(wr,wg,wb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(wr,wg,wb),font=font_type)
 		elif Fontcolor == "Indigo":
 			ir = int(51)
 			ig = int(153)
 			ib = int(255)
-			draw.text(xy=(a,b),text="Hello World",fill=(ir,ig,ib),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(ir,ig,ib),font=font_type)
 		elif Fontcolor == "Lime":
 			lr = int(153)
 			lg = int(255)
 			lb = int(51)
-			draw.text(xy=(a,b),text="Hello World",fill=(lr,lg,lb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(lr,lg,lb),font=font_type)
 		elif Fontcolor == "Gray":
 			grr = int(128)
 			grg = int(128)
 			grb = int(128)
-			draw.text(xy=(a,b),text="Hello World",fill=(grr,grg,grb),font=font_type)
+			draw.text(xy=(a,b),text=maintext,fill=(grr,grg,grb),font=font_type)
 
 		my_ImageOpen = ImageTk.PhotoImage(edge)
 		my_label2 = ttk.Label(frame,image=my_ImageOpen)
@@ -721,6 +745,312 @@ def addtextnow():
 
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def br():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+		
+		br_edge = ImageEnhance.Brightness(edge)
+
+		if int(brightness.get()) == 0:
+			edge = br_edge.enhance(0.5)
+		elif int(brightness.get()) == 1:
+			edge = br_edge.enhance(0.6)
+		elif int(brightness.get()) == 2:
+			edge = br_edge.enhance(0.7)
+		elif int(brightness.get()) == 3:
+			edge = br_edge.enhance(0.8)
+		elif int(brightness.get()) == 4:
+			edge = br_edge.enhance(0.9)
+		elif int(brightness.get()) == 5:
+			edge = br_edge.enhance(1.0)
+		elif int(brightness.get()) == 6:
+			edge = br_edge.enhance(1.1)
+		elif int(brightness.get()) == 7:
+			edge = br_edge.enhance(1.2)
+		elif int(brightness.get()) == 8:
+			edge = br_edge.enhance(1.3)
+		elif int(brightness.get()) == 9:
+			edge = br_edge.enhance(1.4)
+		elif int(brightness.get()) == 10:
+			edge = br_edge.enhance(1.5)
+
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def con():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+		
+		br_edge = ImageEnhance.Contrast(edge)
+
+		if int(contrast.get()) == 0:
+			edge = br_edge.enhance(0.5)
+		elif int(contrast.get()) == 1:
+			edge = br_edge.enhance(0.6)
+		elif int(contrast.get()) == 2:
+			edge = br_edge.enhance(0.7)
+		elif int(contrast.get()) == 3:
+			edge = br_edge.enhance(0.8)
+		elif int(contrast.get()) == 4:
+			edge = br_edge.enhance(0.9)
+		elif int(contrast.get()) == 5:
+			edge = br_edge.enhance(1.0)
+		elif int(contrast.get()) == 6:
+			edge = br_edge.enhance(1.1)
+		elif int(contrast.get()) == 7:
+			edge = br_edge.enhance(1.2)
+		elif int(contrast.get()) == 8:
+			edge = br_edge.enhance(1.3)
+		elif int(contrast.get()) == 9:
+			edge = br_edge.enhance(1.4)
+		elif int(contrast.get()) == 10:
+			edge = br_edge.enhance(1.5)
+
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+
+def sharp():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+		
+		br_edge = ImageEnhance.Sharpness(edge)
+
+		if int(sharpness.get()) == 0:
+			edge = br_edge.enhance(0.5)
+		elif int(sharpness.get()) == 1:
+			edge = br_edge.enhance(0.6)
+		elif int(sharpness.get()) == 2:
+			edge = br_edge.enhance(0.7)
+		elif int(sharpness.get()) == 3:
+			edge = br_edge.enhance(0.8)
+		elif int(sharpness.get()) == 4:
+			edge = br_edge.enhance(0.9)
+		elif int(sharpness.get()) == 5:
+			edge = br_edge.enhance(1.0)
+		elif int(sharpness.get()) == 6:
+			edge = br_edge.enhance(1.1)
+		elif int(sharpness.get()) == 7:
+			edge = br_edge.enhance(1.2)
+		elif int(sharpness.get()) == 8:
+			edge = br_edge.enhance(1.3)
+		elif int(sharpness.get()) == 9:
+			edge = br_edge.enhance(1.4)
+		elif int(sharpness.get()) == 10:
+			edge = br_edge.enhance(1.5)
+
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def sat():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+		
+		br_edge = ImageEnhance.Color(edge)
+
+		if int(saturation.get()) == 0:
+			edge = br_edge.enhance(0.5)
+		elif int(saturation.get()) == 1:
+			edge = br_edge.enhance(0.6)
+		elif int(saturation.get()) == 2:
+			edge = br_edge.enhance(0.7)
+		elif int(saturation.get()) == 3:
+			edge = br_edge.enhance(0.8)
+		elif int(saturation.get()) == 4:
+			edge = br_edge.enhance(0.9)
+		elif int(saturation.get()) == 5:
+			edge = br_edge.enhance(1.0)
+		elif int(saturation.get()) == 6:
+			edge = br_edge.enhance(1.1)
+		elif int(saturation.get()) == 7:
+			edge = br_edge.enhance(1.2)
+		elif int(saturation.get()) == 8:
+			edge = br_edge.enhance(1.3)
+		elif int(saturation.get()) == 9:
+			edge = br_edge.enhance(1.4)
+		elif int(saturation.get()) == 10:
+			edge = br_edge.enhance(1.5)
+
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def shad():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+		
+		# br_edge = ImageEnhance.Brightness(edge)
+		# con_edge = ImageEnhance.Contrast(edge)
+
+		if int(shadow.get()) == 0:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.95)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.70)
+		elif int(shadow.get()) == 1:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.92)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.05)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.73)
+		elif int(shadow.get()) == 2:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.90)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.10)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.75)
+		elif int(shadow.get()) == 3:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.87)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.15)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.77)
+		elif int(shadow.get()) == 4:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.84)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.20)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.80)
+		elif int(shadow.get()) == 5:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.82)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.25)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.82)
+		elif int(shadow.get()) == 6:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.80)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.30)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.84)
+		elif int(shadow.get()) == 7:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.77)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.35)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.87)
+		elif int(shadow.get()) == 8:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.75)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.40)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.90)
+		elif int(shadow.get()) == 9:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.73)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.45)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.92)
+		elif int(shadow.get()) == 10:
+			br_edge = ImageEnhance.Brightness(edge)
+			edge = br_edge.enhance(0.70)
+			con_edge = ImageEnhance.Contrast(edge)
+			edge = con_edge.enhance(1.50)
+			sat_edge = ImageEnhance.Color(edge)
+			edge = sat_edge.enhance(0.95)
+
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def en():
+	global my_label2,my_ImageOpen,edge,a, ImgDetails
+	
+
+	if op == 1:
+		ImgDetails.destroy()
+		my_label2.destroy()
+
+		edge = edge.filter(ImageFilter.DETAIL)
+		width, height = edge.size
+
+
+		my_ImageOpen = ImageTk.PhotoImage(edge)
+		my_label2 = ttk.Label(frame,image=my_ImageOpen)
+		my_label2.pack(side=TOP,fill=X)
+
+		ImgDetails = Label(frame, text="current image's width = "+str(width)+" and height = "+str(height))
+		ImgDetails.pack(side=BOTTOM)
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")	
 
 # create pulldown menus
 menubar = Menu(root)
@@ -758,6 +1088,7 @@ hflip_icon = tk.PhotoImage(file='icons/hflip.png')
 vflip_icon = tk.PhotoImage(file='icons/vflip.png')
 effects_icon = tk.PhotoImage(file='icons/effects.png')
 text_icon = tk.PhotoImage(file='icons/text.png')
+text_icon2 = tk.PhotoImage(file='icons/text2.png')
 draw_icon = tk.PhotoImage(file='icons/draw.png')
 adjust_icon = tk.PhotoImage(file='icons/adjust.png')
 
@@ -771,6 +1102,8 @@ mail_icon = tk.PhotoImage(file='icons/mail.png')
 reset_icon = tk.PhotoImage(file='icons/reset.png')
 reset_icon2 = tk.PhotoImage(file='icons/resettext.png')
 crop2_icon = tk.PhotoImage(file='icons/crop2.png')
+apply2_icon = tk.PhotoImage(file='icons/apply2.png')
+adapply_icon = tk.PhotoImage(file='icons/apply.png')
 
 #creating menu items
 filemenu = tk.Menu(menubar, tearoff=0)
@@ -849,8 +1182,6 @@ myButton3 = ttk.Button(frameTools, text="Filters")
 myButton4 = ttk.Button(frameTools, text="Add Text")
 myButton5 = ttk.Button(frameTools, text="Draw")
 myButton6 = ttk.Button(frameTools, text="Adjust")
-
-
 
 
 tabControl = ttk.Notebook(frameTools)
@@ -980,26 +1311,49 @@ ResetButton = ttk.Button(filters, text="Reset", compound=tk.TOP, command=reset_n
 ResetButton.pack(ipadx=2,ipady=3, padx=0, pady=5, side=BOTTOM)
 
 #AddText Segment
-fontLabel = ttk.Label(addtext,text="Font Family")
-fontLabel.place(x=95,y=15)
+
+fontLabel = ttk.Label(addtext,text="                   Font Family")
+fontLabel.place(x=95,y=12)
 font = ttk.Combobox(addtext,values=('Bahnschrift','BisonBold','Calibri Bold Italic','Calibri Bold','Calibri Italic','Calibri Regular','CascadiaCode','ComicSans','FranklinGothic','Genuine','Impact','Juniorprince Regular','Krinkes Regular','SiyamRupali','TimesNewRoman','Unispace Bold','Unispace Bold Italic','Unispace Italic','Unispace Regular','ValentLovey'), width=35,justify=CENTER,state='readonly')
 font.set("Choose a font family")
 font.bind("<<ComboboxSelected>>",fontClicked)
-font.place(x=98,y=40,height=28,width=180)
+font.place(x=98,y=33,height=21,width=180)
 
-fontColorLabel = ttk.Label(addtext,text="Font Color")
-fontColorLabel.place(x=95,y=85)
+fontColorLabel = ttk.Label(addtext,text="                    Font Color")
+fontColorLabel.place(x=95,y=71)
 fontColor = ttk.Combobox(addtext,values=('Violet','Yellow','Blue','Green','Orange','Black','Brown','White','Indigo','Lime','Gray'), width=35,justify=CENTER,state='readonly')
 fontColor.set("Choose a font color")
 fontColor.bind("<<ComboboxSelected>>",fontColorClicked)
-fontColor.place(x=98,y=109,height=28,width=180)
+fontColor.place(x=98,y=92,height=21,width=180)
 
-TextPosLabel = ttk.Label(addtext,text="Adjust Text Position")
-TextPosLabel.place(x=95,y=155)
+fontSizeLabel = ttk.Label(addtext,text="                      Font Size")
+fontSizeLabel.place(x=95,y=130)
+fontSize = ttk.Combobox(addtext,values=('8','9','10','11','12','14','16','18','20','22','24','26','28','36','48','72','94','130'), width=35,justify=CENTER,state='readonly')
+fontSize.set("Choose a Font Size")
+fontSize.bind("<<ComboboxSelected>>",fontSizeClicked)
+fontSize.place(x=98,y=150,height=21,width=180)
+
+MainTextLabel = ttk.Label(addtext,text="                   Adding Text")
+MainTextLabel.place(x=95,y=185)
+
+txtLabel = tk.Entry(addtext, width=30,borderwidth=3)
+txtLabel.place(x=95,y=205,height=28,width=187)
+txtLabel.insert(0, "Enter your Text here")
+txtLabel.configure(state=DISABLED)
+
+def on_click(event):
+		    txtLabel.configure(state=NORMAL)
+		    txtLabel.delete(0, END)
+		    txtLabel.unbind('<Button-1>', on_click_id_tX)
+
+on_click_id_tX = txtLabel.bind('<Button-1>', on_click)
+
+TextPosLabel = ttk.Label(addtext,text="        Adjust Text Position (X,Y)")
+TextPosLabel.place(x=95,y=243)
 
 txtX1Label = tk.Entry(addtext, width=30,borderwidth=3)
-txtX1Label.place(x=95,y=180,height=28,width=187)
-txtX1Label.insert(0, "Enter X1 value here")
+txtX1Label.place(x=95,y=263,height=28,width=187)
+txtX1Label.insert(0, "Enter X value here")
 txtX1Label.configure(state=DISABLED)
 
 def on_click(event):
@@ -1010,8 +1364,8 @@ def on_click(event):
 on_click_id_tX1 = txtX1Label.bind('<Button-1>', on_click)
 
 txtY1Label = tk.Entry(addtext, width=30,borderwidth=3)
-txtY1Label.place(x=95,y=220,height=28,width=187)
-txtY1Label.insert(0, "Enter Y1 value here")
+txtY1Label.place(x=95,y=295,height=28,width=187)
+txtY1Label.insert(0, "Enter Y value here")
 txtY1Label.configure(state=DISABLED)
 
 def on_click(event):
@@ -1021,18 +1375,112 @@ def on_click(event):
 
 on_click_id_tY1 = txtY1Label.bind('<Button-1>', on_click)
 
-fontSizeLabel = ttk.Label(addtext,text="Font Size")
-fontSizeLabel.place(x=95,y=258)
-fontSize = ttk.Combobox(addtext,values=('8','9','10','11','12','14','16','18','20','22','24','26','28','36','48','72','94','130'), width=35,justify=CENTER,state='readonly')
-fontSize.set("Choose a Font Size")
-fontSize.bind("<<ComboboxSelected>>",fontSizeClicked)
-fontSize.place(x=98,y=280,height=28,width=180)
+addtextButton = ttk.Button(addtext, text="Add Text", compound=tk.LEFT, image=text_icon2, command=addtextnow)
+addtextButton.place(x=137,y=335)
 
-addtextButton = ttk.Button(addtext, text="Add Text", compound=tk.LEFT, image=text_icon, command=addtextnow)
-addtextButton.place(x=72,y=330)
+# ResetButton = ttk.Button(addtext, text="Reset", compound=tk.LEFT, command=reset_now, image=reset_icon2)
+# ResetButton.place(x=200,y=336)
 
-ResetButton = ttk.Button(addtext, text="Reset", compound=tk.LEFT, command=reset_now, image=reset_icon2)
-ResetButton.place(x=200,y=331)
+
+
+#Adjust Segment
+brightnessLabel = ttk.Label(adjust,text="                       Brightness")
+brightnessLabel.place(x=8,y=40)
+ApplyBrButton = ttk.Button(adjust, image=adapply_icon, command=br)
+ApplyBrButton.place(x=155,y=32)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=14,y=62)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=182,y=62)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=100,y=85)
+brightness = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+brightness.place(x=30,y=60)
+brightness.set(5)
+
+
+
+
+ContrastLabel = ttk.Label(adjust,text="                        Contrast")
+ContrastLabel.place(x=190,y=40)
+ApplyConButton = ttk.Button(adjust, image=adapply_icon, command=con)
+ApplyConButton.place(x=340,y=32)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=203,y=62)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=368,y=62)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=285,y=85)
+contrast = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+contrast.place(x=215,y=60)
+contrast.set(5)
+
+
+
+ShadowLabel = ttk.Label(adjust,text="                         Shadow")
+ShadowLabel.place(x=8,y=125)
+ApplyConButton = ttk.Button(adjust, image=adapply_icon, command=shad)
+ApplyConButton.place(x=155,y=120)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=14,y=147)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=182,y=147)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=100,y=170)
+shadow = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+shadow.place(x=30,y=145)
+shadow.set(5)
+
+
+
+SaturationLabel = ttk.Label(adjust,text="                         Saturation")
+SaturationLabel.place(x=190,y=125)
+ApplySatButton = ttk.Button(adjust, image=adapply_icon, command=sat)
+ApplySatButton.place(x=340,y=120)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=203,y=147)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=368,y=147)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=285,y=170)
+saturation = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+saturation.place(x=215,y=145)
+saturation.set(5)
+
+
+
+SharpnessLabel = ttk.Label(adjust,text="                         Sharpness")
+SharpnessLabel.place(x=8,y=210)
+ApplySharpButton = ttk.Button(adjust, image=adapply_icon, command=sharp)
+ApplySharpButton.place(x=155,y=205)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=14,y=232)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=182,y=232)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=32,y=255)
+sharpness = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+sharpness.place(x=30,y=230)
+sharpness.set(5)
+
+
+
+EnhancementLabel = ttk.Label(adjust,text="                       Enhancement")
+EnhancementLabel.place(x=190,y=210)
+ApplyEnButton = ttk.Button(adjust, image=adapply_icon, command=en)
+ApplyEnButton.place(x=340,y=205)
+minusLabel = ttk.Label(adjust,text="-")
+minusLabel.place(x=203,y=232)
+plusLabel = ttk.Label(adjust,text="+")
+plusLabel.place(x=368,y=232)
+zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel.place(x=217,y=255)
+enhancement = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
+enhancement.place(x=215,y=230)
+
+ResetButton = ttk.Button(adjust, text="Reset", compound=tk.LEFT, command=reset_now, image=reset_icon2)
+ResetButton.place(x=140,y=330)
+
 
 #Share Buttons Segment
 
@@ -1040,13 +1488,13 @@ shareLabel = Label(frameShare, text="Share this image by uploading to following 
 shareLabel.pack(side=TOP)
 fbButton = ttk.Button(framesiteShare, text="Facebook",image=fb_icon, compound=tk.TOP)
 fbButton.pack(side=LEFT,padx=3)
-fbButton = ttk.Button(framesiteShare, text="Instagram",image=insta_icon, compound=tk.TOP)
-fbButton.pack(side=LEFT,padx=3)
-fbButton = ttk.Button(framesiteShare, text="Twitter",image=twitter_icon, compound=tk.TOP)
-fbButton.pack(side=LEFT,padx=3)
-fbButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, compound=tk.TOP)
-fbButton.pack(side=LEFT,padx=3)
-fbButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP)
-fbButton.pack(side=LEFT,padx=3)
+igButton = ttk.Button(framesiteShare, text="Instagram",image=insta_icon, compound=tk.TOP)
+igButton.pack(side=LEFT,padx=3)
+twitterButton = ttk.Button(framesiteShare, text="Twitter",image=twitter_icon, compound=tk.TOP)
+twitterButton.pack(side=LEFT,padx=3)
+gdriveButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, compound=tk.TOP)
+gdriveButton.pack(side=LEFT,padx=3)
+gmailButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP)
+gmailButton.pack(side=LEFT,padx=3)
 
 root.mainloop()
