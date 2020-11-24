@@ -2,27 +2,34 @@
 # CSE '16, RUET
 # www.github.com/SabirKhanAkash
 
+#importing Modules
+
+import PIL.ImageFont
+import PIL.ImageOps
+import webbrowser
+import tkinter as tk
+import os,sys
+import tkinter.messagebox
 from tkinter import *
 from PIL import ImageTk, Image, ImageDraw, ImageFont
 from PIL import ImageFilter
 from PIL import Image
 from PIL import ImageOps
 from PIL import ImageFont
-import PIL.ImageFont
-import PIL.ImageOps
 from tkinter import font, colorchooser, filedialog, messagebox
 from tkinter import ttk
-import tkinter as tk
-import os,sys
-import tkinter.messagebox
 from tkinter.ttk import Combobox
 from PIL import ImageEnhance
+from time import sleep
 
+#declaring main root window
 
 root = Tk()
 root.title("Easy Photo Editor")
 root.iconbitmap("icons/EasyPhotoEditor.ico")
 root.state("zoomed")
+
+#some global variables
 
 global op
 global my_label2
@@ -35,6 +42,18 @@ op = 0
 
 def hello():
     print("hello!")
+
+def changeTheme():
+	chosenTheme = theme_choice.get()
+	colorTuple = color_dict.get(chosenTheme)
+	fgColor, bgColor = colorTuple[0], colorTuple[1]
+	frame.config(background=bgColor,fg=fgColor)
+	framesiteShare.config(background=bgColor,fg=fgColor)
+	frameShare.config(background=bgColor,fg=fgColor)
+	frameTools.config(background=bgColor,fg=fgColor)
+	frameOpenFile.config(background=bgColor,fg=fgColor)
+	shareLabel.config(background=bgColor,fg=fgColor)
+
 
 def file_open(event=None):
 
@@ -53,16 +72,17 @@ def file_open(event=None):
 		my_label2.destroy()
 
 	count = 1;
-	frame.filename = filedialog.askopenfilename(initialdir="D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images\\", title= " Select a file", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
+	frame.filename = filedialog.askopenfilename( title= " Select a file", defaultextension='.jpg', filetypes= (("jpg", " *.jpg"),("All files","*.*")))
+	root.title(frame.filename+" - "+"Easy Photo Editor")
 	edge = Image.open(frame.filename)
 	width, height = edge.size
 	
 	reset_image = edge
 	if width>890 or height>600:
 		edge = edge.resize((890, 600), Image.ANTIALIAS)
-
+		reset_image = edge
 	my_ImageOpen = ImageTk.PhotoImage(edge)
-	my_label2 = ttk.Label(frame,image=my_ImageOpen)
+	my_label2 = ttk.Label(frame,image=my_ImageOpen,justify=CENTER)
 	my_label2.pack(side=TOP,fill=BOTH,padx=2,pady=2,anchor="nw")
 	width, height = edge.size
 
@@ -73,16 +93,16 @@ def file_open(event=None):
 
 
 def save(event=None):
-	if op == 0:
-		tkinter.messagebox.showerror("Error","Open an image first !") 
-	else:
+	if op == 1:
 		Image.open(frame.filename).save(frame.filename)
-		print(op)
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+		
 
 
 def save_as(event=None):
 	if op == 1:
-		filename = filedialog.asksaveasfile(mode='w', defaultextension='.jpg', title= " Save file as", filetypes= (("All files","*.*"),("png","*.png"),("jpg", " *.jpg")))
+		filename = filedialog.asksaveasfile(mode='w', title= " Save file as", filetypes= (("jpg", " *.jpg"),("All files","*.*")))
 		edge.save(filename)
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")
@@ -215,6 +235,7 @@ def reset_now():
 	shadow.set(5)
 	saturation.set(5)
 	sharpness.set(5)
+	enhancement.set(0)
 	
 
 	if op == 1:
@@ -226,7 +247,7 @@ def reset_now():
 		edge = reset_image
 
 	else:
-		tkinter.messagebox.showerror("Error","Open an image first !")
+		ImageTk.messagebox.showerror("Error","Open an image first !")
 
 	imgX1Label.delete(0, END)
 	imgX1Label.insert(0, "Enter X1 value here")
@@ -521,23 +542,14 @@ def smooth_more():
 def greyscale():
 	global my_label2,my_ImageOpen,edge,a, ImgDetails
 	global newr,newg,newb,r,g,b,px,py,pixels
-	global reset_image2
-	reset_image2 = edge
 
 	if op == 1:
 		ImgDetails.destroy()
 		my_label2.destroy()
 		width, height = edge.size
-		pixels = edge.load()
-		
 
-		for py in range(height):
-			for px in range(width):
-				r,g,b = edge.getpixel((px,py))
-				newr = (r+g+b)//3
-				newg = (r+g+b)//3
-				newb = (r+g+b)//3
-				pixels[px,py] = (newr,newg,newb)
+		grey = ImageEnhance.Color(edge)
+		edge = grey.enhance(0.0)
 
 		my_ImageOpen = ImageTk.PhotoImage(edge)
 		my_label2 = ttk.Label(frame,image=my_ImageOpen)
@@ -549,26 +561,17 @@ def greyscale():
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")	
 
-def sepia():
+def emboss():
 	global my_label2,my_ImageOpen,edge,a, ImgDetails
 	global newr,newg,newb,r,g,b,px,py,pixels,reset_image
-	reset_image = edge
 
 	if op == 1:
 		ImgDetails.destroy()
 		my_label2.destroy()
 		width, height = edge.size
-		# edge.convert("RGB")
-		pixels = edge.load()
-		
-
-		for py in range(height):
-			for px in range(width):
-				r,g,b = edge.getpixel((px,py))
-				newr = int((r * .393)+(g * .769)+(b* .189))
-				newg = int((r * .349)+(g * .686)+(b* .168))
-				newb = int((r * .272)+(g * .534)+(b* .131))
-				pixels[px,py] = (newr,newg,newb)
+		edge = edge.filter(ImageFilter.EDGE_ENHANCE)
+		edge = edge.filter(ImageFilter.SMOOTH)
+		edge = edge.filter(ImageFilter.EMBOSS)
 
 		my_ImageOpen = ImageTk.PhotoImage(edge)
 		my_label2 = ttk.Label(frame,image=my_ImageOpen)
@@ -1052,6 +1055,117 @@ def en():
 	else:
 		tkinter.messagebox.showerror("Error","Open an image first !")	
 
+
+def fb():
+	if op == 1:
+		webbrowser.open("http://www.facebook.com")
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def ig():
+	if op == 1:
+		webbrowser.open("http://www.instagram.com")
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def tw():
+	if op == 1:
+		webbrowser.open("http://www.twitter.com")
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def gdr():
+	if op == 1:
+		webbrowser.open("http://www.drive.google.com")
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def gm():
+	if op == 1:
+		webbrowser.open("https://mail.google.com/mail/u/0/#inbox")
+
+	else:
+		tkinter.messagebox.showerror("Error","Open an image first !")
+
+def taskaboutApp():
+    sleep(3)
+    aboutApp.destroy()
+
+def taskupdate():
+    sleep(2)
+    updateApp.destroy()
+
+def bug():
+	webbrowser.open("https://mail.google.com/mail/u/0/#inbox")
+	reportBug.destroy()
+
+def about():
+	global aboutApp
+	aboutApp = Tk()
+	aboutApp.title("About Easy Photo Editor")
+	aboutApp.iconbitmap("icons/EasyPhotoEditor.ico")
+	aboutApp.geometry("+550+250")
+	aboutApp.minsize(300, 180)
+	aboutApp.resizable(0, 0)
+	aboutApp.config(bg="black")
+	name = Label(aboutApp,text="Easy Photo Editor",justify=CENTER,bg="black")
+	name.config(font=("FranklinGothic", 20),fg="white")
+	ver = Label(aboutApp,text="Version 1.0",justify=CENTER,bg="black")
+	ver.config(font=("FranklinGothic",12),fg="white")
+	name.place(x=35,y=35)
+	ver.place(x=100,y=90)
+	devName = Label(aboutApp,text="Developed by Sabir Khan Akash\n All Rights Reserved. © 2020",justify=CENTER,bg="black")
+	devName.config(font=("FranklinGothic", 10),fg="white")
+	devName.place(x=55,y=135)
+	aboutApp.after(200, taskaboutApp)
+
+def update():
+	global updateApp
+	updateApp = Tk()
+	updateApp.title("Checking for Updates")
+	updateApp.iconbitmap("icons/updates.ico")
+	updateApp.geometry("+550+250")
+	updateApp.minsize(300, 180)
+	updateApp.resizable(0, 0)
+	updateApp.config(bg="black")
+	name = Label(updateApp,text="Easy Photo Editor",justify=CENTER,bg="black")
+	name.config(font=("FranklinGothic", 20),fg="white")
+	ver = Label(updateApp,text="Version 1.0",justify=CENTER,bg="black")
+	ver.config(font=("FranklinGothic",12),fg="white")
+	name.place(x=35,y=35)
+	ver.place(x=100,y=90)
+	updatetext = Label(updateApp,text="You are already using the latest version.",justify=CENTER,bg="black")
+	updatetext.config(font=("FranklinGothic",10),fg="white")
+	updatetext.place(x=35,y=135)
+	updateApp.after(200, taskupdate)
+
+
+def report():
+	global reportBug
+	reportBug = Tk()
+	reportBug.title("Report Bugs to Dev")
+	reportBug.iconbitmap("icons/bug.ico")
+	reportBug.geometry("+550+250")
+	reportBug.minsize(300, 100)
+	reportBug.resizable(0, 0)
+	reportBug.config(bg="black")
+	name = Label(reportBug,text="Easy Photo Editor",justify=CENTER,bg="black")
+	name.config(font=("FranklinGothic", 20),fg="white")
+	ver = Label(reportBug,text="Version 1.0",justify=CENTER,bg="black")
+	ver.config(font=("FranklinGothic",12),fg="white")
+	devmail = Label(reportBug,text="Dev Mail: 1603108@student.ruet.ac.bd",justify=CENTER,bg="black")
+	devmail.config(font=("FranklinGothic", 10),fg="white")
+	name.place(x=35,y=35)
+	ver.place(x=100,y=75)
+	devmail.place(x=35,y=100)
+	reportButton = ttk.Button(reportBug,text="Click Here to mail your bug report",command=bug)
+	reportButton.place(x=55,y=135)
+
+
 # create pulldown menus
 menubar = Menu(root)
 
@@ -1107,29 +1221,30 @@ adapply_icon = tk.PhotoImage(file='icons/apply.png')
 
 #creating menu items
 filemenu = tk.Menu(menubar, tearoff=0)
-editmenu = tk.Menu(menubar, tearoff=0)
+# editmenu = tk.Menu(menubar, tearoff=0)
 helpmenu = tk.Menu(menubar, tearoff=0)
 thememenu = tk.Menu(menubar, tearoff=0)
 
 #adding commands
-filemenu.add_command(label="Open File  				    ", command=file_open, image=openf_icon, compound=tk.LEFT, accelerator='ctrl+O')
-filemenu.add_command(label="Save				        ", command=save, image=save_icon, compound=tk.LEFT, accelerator='ctrl+S')
-filemenu.add_command(label="Save As    		            ", command=save_as, image=saveas_icon, compound=tk.LEFT, accelerator='ctrl+alt+S')
-filemenu.add_command(label="Rename    		            ", command=rename, image=rename_icon, compound=tk.LEFT, accelerator='ctrl+R')
+filemenu.add_command(label="Open File  				    ", command=file_open, image=openf_icon, compound=tk.LEFT,accelerator='ctrl+o')
+filemenu.add_command(label="Save				        ", command=save, image=save_icon, compound=tk.LEFT,accelerator='ctrl+s')
+filemenu.add_command(label="Save As    		            ", command=save_as, image=saveas_icon, compound=tk.LEFT,accelerator='ctrl+shift+s')
+filemenu.add_command(label="Rename    		            ", command=rename, image=rename_icon, compound=tk.LEFT,accelerator='ctrl+r')
 filemenu.add_separator()
-filemenu.add_command(label="Exit				        ", command=root.quit, image=exit_icon, compound=tk.LEFT, accelerator='ctrl+Q')
+filemenu.add_command(label="Exit				        ", command=root.quit, image=exit_icon, compound=tk.LEFT,accelerator='ctrl+q')
 
-editmenu.add_command(label="Undo				", command=hello, image=undo_icon, compound=tk.LEFT, accelerator='ctrl+Z')
-editmenu.add_command(label="Redo				", command=hello, image=redo_icon, compound=tk.LEFT, accelerator='ctrl+shift+z')
-editmenu.add_separator()
-editmenu.add_command(label="Cut                 ", command=hello, image=cut_icon, compound=tk.LEFT, accelerator='ctrl+X')
-editmenu.add_command(label="Copy                ", command=hello, image=copy_icon, compound=tk.LEFT, accelerator='ctrl+C')
-editmenu.add_command(label="Paste               ", command=hello, image=paste_icon, compound=tk.LEFT, accelerator='ctrl+V')
+# editmenu.add_command(label="Undo				", command=hello, image=undo_icon, compound=tk.LEFT, accelerator='ctrl+Z')
+# editmenu.add_command(label="Redo				", command=hello, image=redo_icon, compound=tk.LEFT, accelerator='ctrl+shift+z')
+# editmenu.add_separator()
+# editmenu.add_command(label="Cut                 ", command=hello, image=cut_icon, compound=tk.LEFT, accelerator='ctrl+X')
+# editmenu.add_command(label="Copy                ", command=hello, image=copy_icon, compound=tk.LEFT, accelerator='ctrl+C')
+# editmenu.add_command(label="Paste               ", command=hello, image=paste_icon, compound=tk.LEFT, accelerator='ctrl+V')
 
-helpmenu.add_command(label="About EasyPhotoEditor       ", command=hello, image=about_icon, compound=tk.LEFT, accelerator='ctrl+A')
-helpmenu.add_command(label="Check for updates           ", command=hello, image=updates_icon, compound=tk.LEFT, accelerator='ctrl+U')
-helpmenu.add_command(label="Report Bugs to Dev           ", command=hello, image=bug_icon, compound=tk.LEFT, accelerator='ctrl+B')
+helpmenu.add_command(label="About EasyPhotoEditor       ", command=about, image=about_icon, compound=tk.LEFT)
+helpmenu.add_command(label="Check for updates           ", command=update, image=updates_icon, compound=tk.LEFT)
+helpmenu.add_command(label="Report Bugs to Dev           ", command=report, image=bug_icon, compound=tk.LEFT)
 
+#adding theme
 
 theme_choice = tk.StringVar()
 color_icons = (light_default_icon, light_plus_icon, dark_icon, red_icon, monokai_icon, night_blue_icon)
@@ -1144,26 +1259,27 @@ color_dict = {
 }
 count = 0
 for i in color_dict:
-	thememenu.add_radiobutton(label=i, image=color_icons[count], variable=theme_choice, compound=tk.LEFT)
+	thememenu.add_radiobutton(label=i, image=color_icons[count], variable=theme_choice, compound=tk.LEFT, command=changeTheme)
 	count = count + 1
+
 
 #cascading all menus
 menubar.add_cascade(label="File", menu=filemenu)
-menubar.add_cascade(label="Edit", menu=editmenu)
+# menubar.add_cascade(label="Edit", menu=editmenu)
 menubar.add_cascade(label="Theme", menu=thememenu)
 menubar.add_cascade(label="Help", menu=helpmenu)
 
 root.config(menu=menubar)
 
 #declaring frames
+
 frame = LabelFrame(root,padx=20, pady=20, height=677, width= 944)
 frame.place(x=5,y=3)
 
-frameOpenFile = LabelFrame(root, padx=115, pady=1)
-# frameOpenFile.pack(side=TOP,pady=1)
+frameOpenFile = LabelFrame(root, padx=1, pady=1)
 frameOpenFile.place(x=950,y=2)
 
-frameTools = LabelFrame(root, padx=10, pady=0)
+frameTools = LabelFrame(root, padx=7, pady=0)
 frameTools.place(x=950,y=116)
 
 frameShare = LabelFrame(root, pady=1)
@@ -1172,42 +1288,36 @@ frameShare.place(x=950,y=560)
 framesiteShare = LabelFrame(root, pady=1)
 framesiteShare.place(x=950,y=620)
 
-OpenImageButton = ttk.Button(frameOpenFile, text="Click here to open an image ",image=open_icon, compound=tk.TOP, command= file_open)
+OpenImageButton = ttk.Button(frameOpenFile, text="Click here to open an image ",image=open_icon, compound=tk.TOP, command= file_open,width=62)
 OpenImageButton.pack(ipadx=5,ipady=2, padx=5, pady=5)
 
 
-myButton1 = ttk.Button(frameTools, text="Crop")
-myButton2 = ttk.Button(frameTools, text="Rotate")
-myButton3 = ttk.Button(frameTools, text="Filters")
-myButton4 = ttk.Button(frameTools, text="Add Text")
-myButton5 = ttk.Button(frameTools, text="Draw")
-myButton6 = ttk.Button(frameTools, text="Adjust")
-
+#Editing Tools Segment
 
 tabControl = ttk.Notebook(frameTools)
 
 crop = ttk.Frame(tabControl)
-tabControl.add(crop, text="    Crop    ", image=crop_icon, compound=tk.TOP)
+tabControl.add(crop, text="      Crop      ", image=crop_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=0)
 
 rotate = ttk.Frame(tabControl)
-tabControl.add(rotate, text="    Rotate    ", image=rotate_icon, compound=tk.TOP)
+tabControl.add(rotate, text="      Rotate      ", image=rotate_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=1)
 
 filters = ttk.Frame(tabControl)
-tabControl.add(filters, text="    Filters    ", image=effects_icon, compound=tk.TOP)
+tabControl.add(filters, text="      Filters      ", image=effects_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=2)
 
 addtext = ttk.Frame(tabControl)
-tabControl.add(addtext, text="  Add Text  ", image=text_icon, compound=tk.TOP)
+tabControl.add(addtext, text="    Add Text    ", image=text_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=3)
 
-draw = ttk.Frame(tabControl)
-tabControl.add(draw, text="    Draw    ", image=draw_icon, compound=tk.TOP)
-tabControl.grid(row=0,column=3)
+# draw = ttk.Frame(tabControl)
+# tabControl.add(draw, text="    Draw    ", image=draw_icon, compound=tk.TOP)
+# tabControl.grid(row=0,column=3)
 
 adjust = ttk.Frame(tabControl)
-tabControl.add(adjust, text="    Adjust    ", image=adjust_icon, compound=tk.TOP)
+tabControl.add(adjust, text="       Adjust       ", image=adjust_icon, compound=tk.TOP)
 tabControl.grid(row=0,column=4)
 
 
@@ -1272,6 +1382,7 @@ CropButton.pack(ipadx=2,ipady=1, padx=50, pady=2, side=LEFT)
 ResetButton = ttk.Button(crop, text="Reset", compound=tk.LEFT, command=reset_now, image=reset_icon)
 ResetButton.pack(ipadx=2,ipady=3, padx=10, pady=2, side=LEFT)
 
+
 #Rotate Segment
 
 LeftRotate = ttk.Button(rotate, text="Left Rotation", compound=tk.TOP, image=rotate_icon,command=left_rotate)
@@ -1285,6 +1396,7 @@ VerticalFlip.pack(side=BOTTOM,ipadx=9,ipady=6, padx=15, pady=39)
 
 ResetButton = ttk.Button(rotate, text="Reset", compound=tk.TOP, command=reset_now, image=reset_icon)
 ResetButton.pack(ipadx=2,ipady=3, padx=0, pady=5, side=BOTTOM)
+
 
 #Filters Segment
 
@@ -1304,11 +1416,12 @@ INVERTED = ttk.Button(filters, text="INVERTED\n", compound=tk.TOP,command=invert
 INVERTED.place(x=35,y=232)
 GREYSCALE = ttk.Button(filters, text="GREYSCALE\n", compound=tk.TOP,command=greyscale)
 GREYSCALE.place(x=155,y=232)
-SEPIA = ttk.Button(filters, text="SEPIA\n", compound=tk.TOP,command=sepia)
-SEPIA.place(x=270,y=232)
+emboss = ttk.Button(filters, text="EMBOSS\n", compound=tk.TOP,command=emboss)
+emboss.place(x=270,y=232)
 
 ResetButton = ttk.Button(filters, text="Reset", compound=tk.TOP, command=reset_now, image=reset_icon)
 ResetButton.pack(ipadx=2,ipady=3, padx=0, pady=5, side=BOTTOM)
+
 
 #AddText Segment
 
@@ -1384,6 +1497,7 @@ addtextButton.place(x=137,y=335)
 
 
 #Adjust Segment
+
 brightnessLabel = ttk.Label(adjust,text="                       Brightness")
 brightnessLabel.place(x=8,y=40)
 ApplyBrButton = ttk.Button(adjust, image=adapply_icon, command=br)
@@ -1457,7 +1571,7 @@ minusLabel = ttk.Label(adjust,text="-")
 minusLabel.place(x=14,y=232)
 plusLabel = ttk.Label(adjust,text="+")
 plusLabel.place(x=182,y=232)
-zeroLabel = ttk.Label(adjust,text="0")
+zeroLabel = ttk.Label(adjust,text="                       0")
 zeroLabel.place(x=32,y=255)
 sharpness = ttk.Scale(adjust, from_=0, to=10, length=150, orient=HORIZONTAL)
 sharpness.place(x=30,y=230)
@@ -1484,17 +1598,17 @@ ResetButton.place(x=140,y=330)
 
 #Share Buttons Segment
 
-shareLabel = Label(frameShare, text="Share this image by uploading to following social networking sites !", image=share_icon, compound=tk.LEFT)
+shareLabel = Label(frameShare, text="PLEASE SAVE THE IMAGE FIRST &  \n        UPLOAD AND SHARE THE IMAGE BY CLICKING BELOW !        ", image=share_icon, compound=tk.LEFT)
 shareLabel.pack(side=TOP)
-fbButton = ttk.Button(framesiteShare, text="Facebook",image=fb_icon, compound=tk.TOP)
-fbButton.pack(side=LEFT,padx=3)
-igButton = ttk.Button(framesiteShare, text="Instagram",image=insta_icon, compound=tk.TOP)
-igButton.pack(side=LEFT,padx=3)
-twitterButton = ttk.Button(framesiteShare, text="Twitter",image=twitter_icon, compound=tk.TOP)
-twitterButton.pack(side=LEFT,padx=3)
-gdriveButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, compound=tk.TOP)
-gdriveButton.pack(side=LEFT,padx=3)
-gmailButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP)
-gmailButton.pack(side=LEFT,padx=3)
+fbButton = ttk.Button(framesiteShare, text="Facebook",image=fb_icon, compound=tk.TOP, command=fb)
+fbButton.pack(side=LEFT,padx=2)
+igButton = ttk.Button(framesiteShare, text="Instagram",image=insta_icon, compound=tk.TOP, command=ig)
+igButton.pack(side=LEFT,padx=2)
+twitterButton = ttk.Button(framesiteShare, text="Twitter",image=twitter_icon, compound=tk.TOP, command=tw)
+twitterButton.pack(side=LEFT,padx=2)
+gdriveButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, compound=tk.TOP, command=gdr)
+gdriveButton.pack(side=LEFT,padx=2)
+gmailButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP, command=gm)
+gmailButton.pack(side=LEFT,padx=2)
 
 root.mainloop()
