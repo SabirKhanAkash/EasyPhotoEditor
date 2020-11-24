@@ -153,6 +153,9 @@ def ren():
 	os.rename(oldName+".jpg",newName+".jpg")
 	tkinter.messagebox.showinfo("Rename","Renamed successfully !")
 
+def quit(event=None):
+	root.quit()
+
 def crop_now():
 	global imgX1Label,imgY1Label,imgX2Label,imgY2Label
 	global my_label2,my_ImageOpen,edge, ImgDetails
@@ -1226,12 +1229,12 @@ helpmenu = tk.Menu(menubar, tearoff=0)
 thememenu = tk.Menu(menubar, tearoff=0)
 
 #adding commands
-filemenu.add_command(label="Open File  				    ", command=file_open, image=openf_icon, compound=tk.LEFT,accelerator='ctrl+o')
-filemenu.add_command(label="Save				        ", command=save, image=save_icon, compound=tk.LEFT,accelerator='ctrl+s')
-filemenu.add_command(label="Save As    		            ", command=save_as, image=saveas_icon, compound=tk.LEFT,accelerator='ctrl+shift+s')
-filemenu.add_command(label="Rename    		            ", command=rename, image=rename_icon, compound=tk.LEFT,accelerator='ctrl+r')
+filemenu.add_command(label="Open File  		", command=file_open, image=openf_icon, compound=tk.LEFT,accelerator='ctrl+o')
+filemenu.add_command(label="Save		    ", command=save, image=save_icon, compound=tk.LEFT,accelerator='ctrl+s')
+filemenu.add_command(label="Save As         ", command=save_as, image=saveas_icon, compound=tk.LEFT,accelerator='alt+s')
+filemenu.add_command(label="Rename          ", command=rename, image=rename_icon, compound=tk.LEFT,accelerator='ctrl+r')
 filemenu.add_separator()
-filemenu.add_command(label="Exit				        ", command=root.quit, image=exit_icon, compound=tk.LEFT,accelerator='ctrl+q')
+filemenu.add_command(label="Exit        ", command=quit, image=exit_icon, compound=tk.LEFT,accelerator='ctrl+q')
 
 # editmenu.add_command(label="Undo				", command=hello, image=undo_icon, compound=tk.LEFT, accelerator='ctrl+Z')
 # editmenu.add_command(label="Redo				", command=hello, image=redo_icon, compound=tk.LEFT, accelerator='ctrl+shift+z')
@@ -1243,6 +1246,9 @@ filemenu.add_command(label="Exit				        ", command=root.quit, image=exit_ico
 helpmenu.add_command(label="About EasyPhotoEditor       ", command=about, image=about_icon, compound=tk.LEFT)
 helpmenu.add_command(label="Check for updates           ", command=update, image=updates_icon, compound=tk.LEFT)
 helpmenu.add_command(label="Report Bugs to Dev           ", command=report, image=bug_icon, compound=tk.LEFT)
+
+
+filemenu.bind_all("<Control o>")
 
 #adding theme
 
@@ -1610,5 +1616,11 @@ gdriveButton = ttk.Button(framesiteShare, text="G Drive",image=gdrive_icon, comp
 gdriveButton.pack(side=LEFT,padx=2)
 gmailButton = ttk.Button(framesiteShare, text="Gmail",image=mail_icon, compound=tk.TOP, command=gm)
 gmailButton.pack(side=LEFT,padx=2)
+
+root.bind("<Control o>",file_open)
+root.bind("<Control s>",save)
+root.bind("<Alt s>",save_as)
+root.bind("<Control r>",rename)
+root.bind("<Control q>",quit)
 
 root.mainloop()
