@@ -74,6 +74,7 @@ def file_open(event=None):
 	count = 1;
 	frame.filename = filedialog.askopenfilename( title= " Select a file", defaultextension='.jpg', filetypes= (("jpg", " *.jpg"),("All files","*.*")))
 	root.title(frame.filename+" - "+"Easy Photo Editor")
+	print(frame.filename)
 	edge = Image.open(frame.filename)
 	width, height = edge.size
 	
@@ -112,10 +113,10 @@ def rename(event=None):
 		global e,f,renameWindow
 		renameWindow = Tk()
 		renameWindow.title("Rename this image")
-		renameWindow.iconbitmap("icons/rename.png")
+		renameWindow.iconbitmap("icons/rename.ico")
 		renameWindow.geometry("+400+250")
 		renameWindow.minsize(300, 180)
-		e = Entry(renameWindow, width=25,borderwidth=2)
+		e = tk.Entry(renameWindow, width=25,borderwidth=2)
 		e.pack(side=LEFT,padx=15)
 		e.insert(0, "Enter current name here")
 		e.configure(state=DISABLED)
@@ -127,7 +128,7 @@ def rename(event=None):
 
 		on_click_id_e = e.bind('<Button-1>', on_click)
 
-		f = Entry(renameWindow, width=25,borderwidth=2)
+		f = tk.Entry(renameWindow, width=25,borderwidth=2)
 		f.pack(side=LEFT,padx=15)
 		f.insert(0, "Enter new name here")
 		f.configure(state=DISABLED)
@@ -149,9 +150,12 @@ def ren():
 	global NewName,oldName 
 	oldName = e.get()
 	newName = f.get()
-	os.chdir('D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\Images\\')
+	oldName2 = oldName+".jpg"
+	print(frame.filename)
+	os.chdir((frame.filename).removesuffix(oldName2))
 	os.rename(oldName+".jpg",newName+".jpg")
 	tkinter.messagebox.showinfo("Rename","Renamed successfully !")
+	renameWindow.quit()
 
 def quit(event=None):
 	root.quit()
@@ -611,7 +615,7 @@ def inverted():
 
 def fontClicked(event):
 	global Fontfamily
-	fontDir = "D:\\Study Materials\\Study\\My Python Workspace\\3-2 Project\\EasyPhotoEditor\\fonts\\"
+	fontDir = "fonts/"
 	fontExt = ".ttf"
 	Fontfamily = fontDir+font.get()+fontExt
 	print(Fontfamily)
@@ -1329,7 +1333,7 @@ tabControl.grid(row=0,column=4)
 
 #CROP SEGMENT
 
-ep = Image.open("Images/Test.jpg")
+ep = Image.open("icons/Test.jpg")
 HelpImage = ImageTk.PhotoImage(ep)
 HelpImageLabel = ttk.Label(crop,image=HelpImage)
 HelpImageLabel.pack()
