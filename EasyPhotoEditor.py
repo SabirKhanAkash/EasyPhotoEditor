@@ -3,7 +3,10 @@
 # www.github.com/SabirKhanAkash
 
 #importing Modules
+<<<<<<< HEAD
 import cv2
+=======
+>>>>>>> ff228df3f8603c75f450df87bdfb2099905f096f
 import PIL.ImageFont
 import PIL.ImageOps
 import webbrowser
@@ -27,7 +30,20 @@ from time import sleep
 root = Tk()
 root.title("Easy Photo Editor")
 root.iconbitmap("icons/EasyPhotoEditor.ico")
-root.state("zoomed")
+screen_width = root.winfo_screenwidth()
+screen_height = root.winfo_screenheight()
+root.resizable(0, 0)
+
+if screen_width > 1360 and screen_height > 705:
+	root.minsize(1360,705)
+	edited_screen_width = (screen_width - 1360)/2
+	edited_screen_height = (screen_height - 705)/2
+	real_size = "+%d+%d" % (edited_screen_width,edited_screen_height)
+	root.geometry(real_size)
+else:
+
+	root.minsize(1360,705)
+
 
 #some global variables
 
@@ -71,7 +87,7 @@ def file_open(event=None):
 		ImgDetails.destroy()
 		my_label2.destroy()
 
-	count = 1;
+	count = 1
 	frame.filename = filedialog.askopenfilename( title= " Select a file", defaultextension='.jpg', filetypes= (("jpg", " *.jpg"),("All files","*.*")))
 	root.title(frame.filename+" - "+"Easy Photo Editor")
 	print(frame.filename)
@@ -1289,7 +1305,7 @@ frame.place(x=5,y=3)
 frameOpenFile = LabelFrame(root, padx=1, pady=1)
 frameOpenFile.place(x=950,y=2)
 
-frameTools = LabelFrame(root, padx=7, pady=0)
+frameTools = LabelFrame(root, padx=5, pady=0)
 frameTools.place(x=950,y=116)
 
 frameShare = LabelFrame(root, pady=1)
