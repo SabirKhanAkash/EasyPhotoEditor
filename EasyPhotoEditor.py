@@ -3,7 +3,7 @@
 # www.github.com/SabirKhanAkash
 
 #importing Modules
-
+import cv2
 import PIL.ImageFont
 import PIL.ImageOps
 import webbrowser
